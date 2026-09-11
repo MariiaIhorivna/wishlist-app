@@ -7,16 +7,52 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- Шапка з назвою -->
+    <header>
+      <h1>Список бажань</h1>
+    </header>
 
-    <!-- Форма додавання нового бажання -->
+    <main>
+      <section>
+        <h2>Додати бажання</h2>
+        <form>
+          <label for="add-wish-title-input">Назва бажання</label>
+          <input type="text" id="add-wish-title-input" name="wish-title">
 
-    <!-- Список бажаних речей (картки з ціною й пріоритетом) -->
+          <label for="add-wish-price-input">Ціна бажання</label>
+          <input type="number" id="add-wish-price-input" name="wish-price">
 
-    <!-- Блок підсумкової суми -->
+          <label for="add-wish-currency">Валюта</label>
+          <select name="currency-select" id="add-wish-currency">
+            <option value="UAH">грн</option>
+            <option value="USD">$</option>
+            <option value="EUR">€</option>
+          </select>
+        </form>
+      </section>
+  
+      <section>
+        <h2>Мої бажання</h2>
+        <article>
+          <h3>Сумка</h3>
+          <p>1000 грн</p>
+        </article>
+        <article>
+          <h3>Друшляк</h3>
+          <p>500 грн</p>
+        </article>
+      </section>
+    </main>
 
-    <!-- Підвал -->
+    <aside>
+      <h2>Підсумкова сума</h2>
+      <p>1500 грн</p>
+    </aside>
+
+    <footer>
+      <p>Яценко М.І. Дані надані навчальним прикладом. Список бажань. © 2026</p>
+    </footer>
 
     <script src="js/app.js"></script>
   </body>
 </html>
+
