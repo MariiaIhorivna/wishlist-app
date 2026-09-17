@@ -1,0 +1,64 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}   
+
+body {
+    margin: 0;
+    font-family: "Brush Script MT", "Comic Sans MS", "Apple Chancery", cursive;
+    font-size: 1rem;
+    line-height: 1.5;
+    background-color: #fffdd0;
+}
+
+header {
+    background-color: #ff8da1;
+    padding: 8px;
+}
+
+h1 {
+    color: #ffdc47;
+    font-size: 2.5rem;
+}
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 8px 16px;
+}
+
+section {
+    margin-bottom: 32px;
+}
+
+.wish-card {
+    padding: 14px;
+    border: 1px solid #ffdc47;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.wish-card--purchased {
+    opacity: 0.6;
+}
+
+.wish-card--purchased h3 {
+  text-decoration: line-through;
+}
+
+aside {
+    background-color: #ff8da1;
+    border: 4px dashed #ffdc47;
+    color: #ffdc47;
+}
+
+aside p {
+    font-size: 1.8rem;
+}
+
+footer {
+    font-size: 0.7rem;
+    color: #6c757d;
+    padding: 10px;
+}
+
+
