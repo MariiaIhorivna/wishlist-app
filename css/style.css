@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Infant:ital,wght@0,300..700;1,300..700&display=swap');
+
 *, *::before, *::after {
     box-sizing: border-box;
-}   
+} 
 
 body {
     margin: 0;
-    font-family: "Brush Script MT", "Comic Sans MS", "Apple Chancery", cursive;
+    font-family: "Cormorant Infant", Georgia, "Times New Roman", serif;
     font-size: 1rem;
     line-height: 1.5;
     background-color: #fffdd0;
@@ -47,12 +49,14 @@ section {
 
 aside {
     background-color: #ff8da1;
-    border: 4px dashed #ffdc47;
-    color: #ffdc47;
+    border-top: 3px solid #ffdc47;
+    border-bottom: 3px solid #ffdc47;
+    color: #3E141B;
 }
 
 aside p {
     font-size: 1.8rem;
+    font-weight: bold;
 }
 
 footer {
