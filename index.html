@@ -11,38 +11,39 @@
       <h1>Список бажань</h1>
     </header>
 
-    <main>
-      <section>
-        <h2>Додати бажання</h2>
-        <form>
-          <label for="add-wish-title-input">Назва бажання</label>
-          <input type="text" id="add-wish-title-input" name="wish-title">
+    <div class="content">
+      <main>
+        <section>
+          <h2>Додати бажання</h2>
+          <form>
+            <label for="add-wish-title-input">Назва бажання</label>
+            <input type="text" id="add-wish-title-input" name="wish-title">
 
-          <label for="add-wish-price-input">Ціна бажання</label>
-          <input type="number" id="add-wish-price-input" name="wish-price">
-        </form>
-      </section>
-  
-      <section>
-        <h2>Мої бажання</h2>
+            <label for="add-wish-price-input">Ціна бажання</label>
+            <input type="number" id="add-wish-price-input" name="wish-price">
+          </form>
+        </section>
+    
+        <section>
+          <h2>Мої бажання</h2>
+          <div class="cards">
+            <article class="wish-card">
+              <h3>Сумка</h3>
+              <p>1000 грн</p>
+            </article>
+            <article class="wish-card wish-card--purchased">
+              <h3>Друшляк</h3>
+              <p>500 грн</p>
+            </article>
+          </div>
+        </section>
+      </main>
 
-        <div class="cards">
-          <article class="wish-card">
-            <h3>Сумка</h3>
-            <p>1000 грн</p>
-          </article>
-          <article class="wish-card wish-card--purchased">
-            <h3>Друшляк</h3>
-            <p>500 грн</p>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <aside>
-      <h2>Підсумкова сума</h2>
-      <p>1500 грн</p>
-    </aside>
+      <aside>
+        <h2>Підсумкова сума</h2>
+        <p>1500 грн</p>
+      </aside>
+    </div>
 
     <footer>
       <p>Яценко М.І. Дані надані навчальним прикладом. Список бажань. © 2026</p>
