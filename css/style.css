@@ -13,6 +13,8 @@ body {
 }
 
 header {
+    display: flex;
+    justify-content: center;
     background-color: #ff8da1;
     padding: 8px;
 }
@@ -30,6 +32,11 @@ main {
 
 section {
     margin-bottom: 32px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: 1fr;
 }
 
 .wish-card {
@@ -65,4 +72,33 @@ footer {
     padding: 10px;
 }
 
+@media (min-width: 600px)
+{
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (min-width: 1024px)
+{
+    .cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    .content {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+    }
+
+    aside {
+        border-left: 3px solid #ffdc47;
+    }
+
+    main {
+        max-width: 1000px;
+        padding: 16px 24px;
+    }
+}
 
