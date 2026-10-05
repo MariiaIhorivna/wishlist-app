@@ -141,6 +141,26 @@ section h2 {
     border-left-color: #6c757d;
 }
 
+.wish-card.priority-high::after, .wish-card.priority-medium::after,
+.wish-card.priority-low::after {
+  display: block;
+  font-size: 1.1rem;
+  color: #3E141B;
+  margin-top: 8px;
+}
+
+.wish-card.priority-high::after {
+  content: "Пріоритет: Високий";
+}
+
+.wish-card.priority-medium::after {
+  content: "Пріоритет: Середній";
+}
+
+.wish-card.priority-low::after {
+  content: "Пріоритет: Низький";
+}
+
 .wish-card h3 {
     font-size: 1.4rem;
     font-weight: 600;
