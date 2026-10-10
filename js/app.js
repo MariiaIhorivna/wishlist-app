@@ -1,3 +1,5 @@
+document.querySelectorAll('.wish-card').forEach(card => card.remove());
+
 // Масив із бажаннями
 const wishList = [
   {
@@ -9,10 +11,15 @@ const wishList = [
     title: 'Друшляк',
     price: 500,
     priority: 'низький'
+  },
+  {
+    title: 'Книжка',
+    price: 600,
+    priority: 'середній'
   }
 ];
 
-// Обчислює загальну суму всіх бажань у масиві та виводить результат у консоль
+// Обчислює загальну суму всіх бажань у масиві та повертає результат
 function getTotalCost(wishList) {
   let totalCost = 0;
 
@@ -20,10 +27,8 @@ function getTotalCost(wishList) {
     totalCost += wish.price;
   }
 
-  console.log(`Загальна вартість усіх бажань: ${totalCost} грн`);
+  return totalCost;
 }
-
-getTotalCost(wishList);
 
 // Класифікація елементів: додаємо прапорець isHighPriority для бажань з високим пріоритетом
 for (const wish of wishList) {
@@ -43,3 +48,39 @@ const result = withinBudget(itemPrice, myBudget);
 const resultAnswer = result === true ? 'Так' : 'Ні';
 console.log(`Чи входить бажання ${itemTitle} вартістю ${itemPrice} грн у бюджет ${myBudget} грн?`, resultAnswer);
 
+const listContainer = document.querySelector('#wishlist');
+
+// Функція для динамічного створення та виведення карток бажань на сторінку
+function renderWishList(wishList)
+{
+  for (const wish of wishList)
+  {
+    const card = document.createElement('article');
+    const titleCard = document.createElement('h3');
+    const priceCard = document.createElement('p');
+
+    titleCard.textContent = wish.title;
+    priceCard.textContent = wish.price;
+
+    card.append(titleCard, priceCard);
+    card.setAttribute('data-priority', wish.priority);
+
+    card.classList.add('wish-card');
+    
+    if (wish.priority === 'високий')
+    {
+      card.classList.add('priority-high');
+    } else if (wish.priority === 'середній')
+    {
+      card.classList.add('priority-medium');
+    } else {
+      card.classList.add('priority-low');
+    }
+
+    listContainer.append(card);
+  }
+}
+
+renderWishList(wishList);
+const totalPrice = document.getElementById('total-price');
+totalPrice.textContent = `${getTotalCost(wishList)} грн`;
