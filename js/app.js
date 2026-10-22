@@ -60,7 +60,7 @@ function renderWishList(wishList)
     const priceCard = document.createElement('p');
 
     titleCard.textContent = wish.title;
-    priceCard.textContent = wish.price;
+    priceCard.textContent = `${wish.price} грн`;
 
     card.append(titleCard, priceCard);
     card.setAttribute('data-priority', wish.priority);
