@@ -19,13 +19,13 @@
           <h2>Додати бажання</h2>
           <form class="add-wish-form">
             <label for="add-wish-title-input">Назва бажання</label>
-            <input class="add-wish-input" type="text" placeholder="Машина" id="add-wish-title-input" name="wish-title">
+            <input class="add-wish-input" type="text" placeholder="Машина" id="add-wish-title-input" name="wish-title" required>
 
             <label for="add-wish-price-input">Ціна бажання</label>
-            <input class="add-wish-input" type="number" placeholder="10000 (вказується в гривнях)" min="0" step="0.01" id="add-wish-price-input" name="wish-price">
+            <input class="add-wish-input" type="number" placeholder="10000 (вказується в гривнях)" min="0" step="0.01" id="add-wish-price-input" name="wish-price" required>
 
             <label for="wishPriority">Пріоритет</label>
-            <select id="wishPriority" class="priority-select" required>
+            <select name="wish-priority" id="wishPriority" class="priority-select" required>
               <option value="low">Низький ⚪</option>
               <option value="medium" selected>Середній 🟡</option>
               <option value="high">Високий 🔴</option>
