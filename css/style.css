@@ -41,6 +41,34 @@ section {
   font-size: 1.2rem;
 }
 
+#error-message {
+  margin: 20px auto;
+  padding: 12px 18px;
+  max-width: 500px;
+  text-align: center;
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1.1rem;
+  color: #3e141b;
+  background-color: #fff0f2;
+  border: 1.5px solid #ff8da1;
+  border-radius: 8px;
+}
+
+#retry-btn {
+  display: block;
+  margin: 12px auto;
+  padding: 10px 24px;
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #3e141b;
+  background-color: #ff8da1;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
 .cards {
   display: grid;
   grid-template-columns: 1fr;
@@ -125,7 +153,8 @@ section h2 {
   border: 1.5px solid #ff8da1;
 }
 
-.add-wish-btn-submit:hover {
+.add-wish-btn-submit:hover,
+#retry-btn:hover {
   background-color: #ff758f;
   border-color: #ff758f;
   box-shadow: 0 4px 12px rgba(255, 141, 161, 0.4);
