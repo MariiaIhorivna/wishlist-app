@@ -182,11 +182,13 @@ async function loadData() {
       );
     }
     const data = await response.json();
-    const wishes = data.map((wish) => ({
-      title: wish.title,
-      completed: wish.completed,
-      price: Math.floor(Math.random() * 10000),
-    }));
+    const wishes = data
+      .filter((wish) => !wishList.some((item) => item.title === wish.title))
+      .map((wish) => ({
+        title: wish.title,
+        completed: wish.completed,
+        price: Math.floor(Math.random() * 10000),
+      }));
 
     wishList.push(...wishes);
     renderWishList(wishList);
