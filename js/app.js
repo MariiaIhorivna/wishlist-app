@@ -1,20 +1,26 @@
+const API_JSONPlaceholder =
+  'https://jsonplaceholder.typicode.com/todos?userId=2';
+
 // Масив із бажаннями
 const wishList = [
   {
     title: 'Сумка',
     price: 1000,
-    priority: 'high'
+    priority: 'high',
+    completed: false,
   },
   {
     title: 'Друшляк',
     price: 500,
-    priority: 'low'
+    priority: 'low',
+    completed: false,
   },
   {
     title: 'Книжка',
     price: 600,
-    priority: 'medium'
-  }
+    priority: 'medium',
+    completed: true,
+  },
 ];
 
 // Обчислює загальну суму всіх бажань у масиві та повертає результат
@@ -44,17 +50,18 @@ const myBudget = 800;
 
 const result = withinBudget(itemPrice, myBudget);
 const resultAnswer = result === true ? 'Так' : 'Ні';
-console.log(`Чи входить бажання ${itemTitle} вартістю ${itemPrice} грн у бюджет ${myBudget} грн?`, resultAnswer);
+console.log(
+  `Чи входить бажання ${itemTitle} вартістю ${itemPrice} грн у бюджет ${myBudget} грн?`,
+  resultAnswer,
+);
 
 const listContainer = document.querySelector('#wishlist');
 
 // Функція для динамічного створення та виведення карток бажань на сторінку
-function renderWishList(wishList)
-{
+function renderWishList(wishList) {
   listContainer.innerHTML = '';
 
-  for (const [index, wish] of wishList.entries())
-  {
+  for (const [index, wish] of wishList.entries()) {
     const card = document.createElement('article');
     const titleCard = document.createElement('h3');
     const priceCard = document.createElement('p');
@@ -66,53 +73,68 @@ function renderWishList(wishList)
     card.setAttribute('data-priority', wish.priority);
     card.setAttribute('data-index', index);
 
-    card.insertAdjacentHTML('beforeend', 
+    card.insertAdjacentHTML(
+      'beforeend',
       `<select class="priority-select" aria-label="Пріоритет бажання">
           <option value="low" ${wish.priority === 'low' ? 'selected' : ''}>Низький</option>
           <option value="medium" ${wish.priority === 'medium' ? 'selected' : ''}>Середній</option>
           <option value="high" ${wish.priority === 'high' ? 'selected' : ''}>Високий</option>
-      </select>`);
+      </select>`,
+    );
 
     card.classList.add('wish-card');
-    
-    if (wish.priority === 'high')
-    {
+
+    if (wish.completed) {
+      card.classList.add('wish-card--purchased');
+    }
+
+    const purchasedBtn = document.createElement('button');
+    purchasedBtn.classList.add('purchased-btn');
+
+    purchasedBtn.textContent = wish.completed
+      ? 'Повернути в список'
+      : 'Позначити як придбане';
+
+    purchasedBtn.addEventListener('click', () => {
+      wish.completed = !wish.completed;
+      renderWishList(wishList);
+    });
+
+    if (wish.priority === 'high') {
       card.classList.add('priority-high');
-    } else if (wish.priority === 'medium')
-    {
+    } else if (wish.priority === 'medium') {
       card.classList.add('priority-medium');
     } else {
       card.classList.add('priority-low');
     }
 
     listContainer.append(card);
+    card.append(purchasedBtn);
   }
 
   const totalPrice = document.getElementById('total-price');
   totalPrice.textContent = `${getTotalCost(wishList)} грн`;
 }
 
-renderWishList(wishList);
-
 // Обробник події сабміту форми: додає нове бажання до масиву, оновлює інтерфейс і скидає форму
 const form = document.querySelector('.add-wish-form');
-form.addEventListener('submit', event => {
+form.addEventListener('submit', (event) => {
   event.preventDefault();
   const titleValueForm = event.target.elements['wish-title'].value;
   const priceValueForm = Number(event.target.elements['wish-price'].value);
   const priorityValueForm = event.target.elements['wish-priority'].value;
 
   const newWish = {
-        title: titleValueForm,
-        price: priceValueForm,
-        priority: priorityValueForm
-    };
+    title: titleValueForm,
+    price: priceValueForm,
+    priority: priorityValueForm,
+  };
 
-    wishList.push(newWish);
+  wishList.push(newWish);
 
-    renderWishList(wishList);
+  renderWishList(wishList);
 
-    form.reset();
+  form.reset();
 });
 
 // Обробник події введення для ціни: перевіряє значення на від'ємність та керує кастомною валідацією
@@ -124,16 +146,16 @@ priceInput.addEventListener('input', () => {
   } else {
     priceInput.setCustomValidity('');
   }
-})
+});
 
-// Обробник події change через делегування: оновлює пріоритет бажання в масиві та змінює стиль картки динамічно без перерендеру 
-listContainer.addEventListener('change', event => {
+// Обробник події change через делегування: оновлює пріоритет бажання в масиві та змінює стиль картки динамічно без перерендеру
+listContainer.addEventListener('change', (event) => {
   if (event.target.classList.contains('priority-select')) {
     const selectElement = event.target;
-    const newPriority = selectElement.value; 
+    const newPriority = selectElement.value;
 
     const card = selectElement.closest('.wish-card');
-    const index = card.dataset.index; 
+    const index = card.dataset.index;
 
     wishList[index].priority = newPriority;
 
@@ -143,5 +165,44 @@ listContainer.addEventListener('change', event => {
   }
 });
 
+// Отримання списку завдань з JSONPlaceholder API:
+// https://jsonplaceholder.typicode.com/todos?userId=2
+async function loadData() {
+  const loading = document.getElementById('loading');
+  const errorMessage = document.getElementById('error-message');
+  const retryBtn = document.getElementById('retry-btn');
+  loading.hidden = false;
+  errorMessage.hidden = true;
+  retryBtn.hidden = true;
+  try {
+    const response = await fetch(API_JSONPlaceholder);
+    if (!response.ok) {
+      throw new Error(
+        `Помилка HTTP: ${response.status} ${response.statusText}`,
+      );
+    }
+    const data = await response.json();
+    const wishes = data.map((wish) => ({
+      title: wish.title,
+      completed: wish.completed,
+      price: Math.floor(Math.random() * 10000),
+    }));
 
+    wishList.push(...wishes);
+    renderWishList(wishList);
+  } catch (error) {
+    errorMessage.textContent =
+      'Список бажань недоступний офлайн. Показано раніше завантажені бажання.';
+    errorMessage.hidden = false;
+    retryBtn.hidden = false;
 
+    console.error('Помилка завантаження даних:', error);
+  } finally {
+    loading.hidden = true;
+  }
+}
+
+const retryBtn = document.getElementById('retry-btn');
+retryBtn.addEventListener('click', loadData);
+
+loadData();
