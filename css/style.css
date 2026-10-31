@@ -1,178 +1,204 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Infant:ital,wght@0,300..700;1,300..700&display=swap');
 
-*, *::before, *::after {
-    box-sizing: border-box;
-} 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
-    margin: 0;
-    font-family: "Cormorant Infant", Georgia, "Times New Roman", serif;
-    font-size: 1rem;
-    line-height: 1.5;
-    background-color: #fffdd0;
+  margin: 0;
+  font-family: 'Cormorant Infant', Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: #fffdd0;
 }
 
 header {
-    display: flex;
-    justify-content: center;
-    background-color: #ff8da1;
-    padding: 8px;
+  display: flex;
+  justify-content: center;
+  background-color: #ff8da1;
+  padding: 8px;
 }
 
 h1 {
-    color: #3E141B;
-    font-size: 3rem;
+  color: #3e141b;
+  font-size: 3rem;
 }
 
 main {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 8px 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 8px 16px;
 }
 
 section {
-    margin-bottom: 32px;
+  margin-bottom: 32px;
+}
+
+#loading {
+  text-align: center;
+  font-size: 1.2rem;
 }
 
 .cards {
-    display: grid;
-    grid-template-columns: 1fr;
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
 label {
-    font-size: 1.3rem;
+  font-size: 1.3rem;
 }
 
 section h2 {
-    text-align: center;
-    font-size: 2rem;
+  text-align: center;
+  font-size: 2rem;
 }
 
-.add-wish-input, .priority-select {
-    margin: 12px 0;
-    width: 100%;
-    padding: 12px 16px;
-    font-family: "Cormorant Infant", Georgia, serif;
-    font-size: 1.1rem;
-    color: #3E141B;
-    background-color: #ffffff;
-    border: 1.5px solid #ffdc47; 
-    border-radius: 8px;
-    outline: none; 
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.add-wish-input,
+.priority-select,
+.purchased-btn {
+  margin: 12px 0;
+  width: 100%;
+  padding: 12px 16px;
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1.1rem;
+  color: #3e141b;
+  background-color: #ffffff;
+  border: 1.5px solid #ffdc47;
+  border-radius: 8px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.priority-select {
-    cursor: pointer;
+.priority-select,
+.purchased-btn {
+  cursor: pointer;
+}
+
+.purchased-btn:hover {
+  background-color: #ff8da1;
+  border-color: #ffdc47;
+  box-shadow: 0 3px 10px rgba(255, 141, 161, 0.25);
+  transform: translateY(-2px);
 }
 
 .add-wish-input::placeholder {
-    color: #6c757d;
-    font-style: italic;
+  color: #6c757d;
+  font-style: italic;
 }
 
-.add-wish-input:focus, .add-wish-input:hover,
-.priority-select:hover, .priority-select:focus {
-    border-color: #ff8da1; 
-    box-shadow: 0 0 0 3px rgba(255, 141, 161, 0.35); 
+.add-wish-input:focus,
+.add-wish-input:hover,
+.priority-select:hover,
+.priority-select:focus {
+  border-color: #ff8da1;
+  box-shadow: 0 0 0 3px rgba(255, 141, 161, 0.35);
 }
 
 .add-wish-btn-container {
-    display: flex;
-    flex-direction: row;
-    gap: 16px;
-    margin-top: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .add-wish-btn {
-    padding: 12px 20px;
-    font-family: "Cormorant Infant", Georgia, serif;
-    font-size: 1.2rem; 
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  padding: 12px 20px;
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
 }
 
 .add-wish-btn-submit {
-    background-color: #ff8da1;
-    color: #3E141B;
-    border: 1.5px solid #ff8da1;
+  background-color: #ff8da1;
+  color: #3e141b;
+  border: 1.5px solid #ff8da1;
 }
 
 .add-wish-btn-submit:hover {
-    background-color: #ff758f; 
-    border-color: #ff758f;
-    box-shadow: 0 4px 12px rgba(255, 141, 161, 0.4); 
-    transform: translateY(-1px); 
+  background-color: #ff758f;
+  border-color: #ff758f;
+  box-shadow: 0 4px 12px rgba(255, 141, 161, 0.4);
+  transform: translateY(-1px);
 }
 
 .add-wish-btn-reset {
-    background-color: rgba(255, 255, 255, 0.6);
-    color: #3E141B;
-    border: 1.5px solid #ffdc47;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #3e141b;
+  border: 1.5px solid #ffdc47;
 }
 
 .add-wish-btn-reset:hover {
-    background-color: #ffffff;
-    border-color: #ff8da1;
+  background-color: #ffffff;
+  border-color: #ff8da1;
 }
 
 .wish-card {
-    background-color: rgba(255, 255, 255, 0.45);
-    text-align: center;
-    padding: 14px;
-    border: 1px solid #ffdc47;
-    border-radius: 10px;
-    margin-bottom: 16px;
-    border-left-width: 6px;
-    border-left-style: solid;
+  background-color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+  padding: 14px;
+  border: 1px solid #ffdc47;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border-left-width: 6px;
+  border-left-style: solid;
 }
 
 .wish-card.priority-high {
-    border-left-color: #ff8da1;
+  border-left-color: #ff8da1;
 }
 
 .wish-card.priority-medium {
-    border-left-color: #ffdc47;
+  border-left-color: #ffdc47;
 }
 
 .wish-card.priority-low {
-    border-left-color: #6c757d;
+  border-left-color: #6c757d;
 }
 
-.wish-card.priority-high::after, .wish-card.priority-medium::after,
+.wish-card.priority-high::after,
+.wish-card.priority-medium::after,
 .wish-card.priority-low::after {
   display: block;
   font-size: 1.1rem;
-  color: #3E141B;
+  color: #3e141b;
   margin-top: 8px;
 }
 
 .wish-card.priority-high::after {
-  content: "Пріоритет: Високий";
+  content: 'Пріоритет: Високий';
 }
 
 .wish-card.priority-medium::after {
-  content: "Пріоритет: Середній";
+  content: 'Пріоритет: Середній';
 }
 
 .wish-card.priority-low::after {
-  content: "Пріоритет: Низький";
+  content: 'Пріоритет: Низький';
 }
 
 .wish-card h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 .wish-card p {
-    font-weight: bold;
-    font-size: 1.7rem;
+  font-weight: bold;
+  font-size: 1.7rem;
 }
 
 .wish-card--purchased {
-    opacity: 0.6;
+  opacity: 0.6;
 }
 
 .wish-card--purchased h3 {
@@ -180,71 +206,69 @@ section h2 {
 }
 
 aside {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center;
-    gap: 16px;
-    padding: 32px;
-    background-color: #ff8da1;
-    border-top: 3px solid #ffdc47;
-    border-bottom: 3px solid #ffdc47;
-    color: #3E141B;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  background-color: #ff8da1;
+  border-top: 3px solid #ffdc47;
+  border-bottom: 3px solid #ffdc47;
+  color: #3e141b;
 }
 
 aside h2 {
-    text-transform: uppercase;
-    margin: 0;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 aside p {
-    margin: 0;
-    font-size: 2.3rem;
-    font-weight: bold;
-    border: 3px solid #ffdd47;
-    background-color: rgba(255, 255, 255, 0.4);
-    padding: 16px;
+  margin: 0;
+  font-size: 2.3rem;
+  font-weight: bold;
+  border: 3px solid #ffdd47;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 16px;
 }
 
 footer {
-    font-size: 0.7rem;
-    color: #6c757d;
-    padding: 10px;
+  font-size: 0.7rem;
+  color: #6c757d;
+  padding: 10px;
 }
 
-@media (min-width: 600px)
-{
-    .wish-card, section h2 {
-        text-align: start;
-    }
-    
-    .cards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
+@media (min-width: 600px) {
+  .wish-card,
+  section h2 {
+    text-align: start;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
 }
 
-@media (min-width: 1024px)
-{
-    .cards {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-    }
+@media (min-width: 1024px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
 
-    .content {
-        display: grid;
-        grid-template-columns: 3fr 1fr;
-    }
+  .content {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+  }
 
-    aside {
-        border-left: 3px solid #ffdc47;
-        box-shadow: -12px 0 24px rgba(255, 141, 161, 0.6);
-    }
+  aside {
+    border-left: 3px solid #ffdc47;
+    box-shadow: -12px 0 24px rgba(255, 141, 161, 0.6);
+  }
 
-    main {
-        width: 100%;
-        max-width: 1000px;
-        padding: 16px 24px;
-    }
+  main {
+    width: 100%;
+    max-width: 1000px;
+    padding: 16px 24px;
+  }
 }
-

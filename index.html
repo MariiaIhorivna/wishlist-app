@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Список бажань</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" href="assets/img/favicon-bow-tie.png" type="image/png">
+    <link rel="icon" href="assets/img/favicon-bow-tie.png" type="image/png" />
     <script src="js/app.js" defer></script>
   </head>
   <body>
@@ -19,27 +19,53 @@
           <h2>Додати бажання</h2>
           <form class="add-wish-form">
             <label for="add-wish-title-input">Назва бажання</label>
-            <input class="add-wish-input" type="text" placeholder="Машина" id="add-wish-title-input" name="wish-title" required>
+            <input
+              class="add-wish-input"
+              type="text"
+              placeholder="Машина"
+              id="add-wish-title-input"
+              name="wish-title"
+              required
+            />
 
             <label for="add-wish-price-input">Ціна бажання</label>
-            <input class="add-wish-input" type="number" placeholder="10000 (вказується в гривнях)" min="0" step="0.01" id="add-wish-price-input" name="wish-price" required>
+            <input
+              class="add-wish-input"
+              type="number"
+              placeholder="10000 (вказується в гривнях)"
+              min="0"
+              step="0.01"
+              id="add-wish-price-input"
+              name="wish-price"
+              required
+            />
 
             <label for="wishPriority">Пріоритет</label>
-            <select name="wish-priority" id="wishPriority" class="priority-select">
+            <select
+              name="wish-priority"
+              id="wishPriority"
+              class="priority-select"
+            >
               <option value="low">Низький ⚪</option>
               <option value="medium" selected>Середній 🟡</option>
               <option value="high">Високий 🔴</option>
             </select>
 
             <div class="add-wish-btn-container">
-              <button type="submit" class="add-wish-btn add-wish-btn-submit">Додати бажання</button>
-              <button type="reset" class="add-wish-btn add-wish-btn-reset">Очистити поля</button>
+              <button type="submit" class="add-wish-btn add-wish-btn-submit">
+                Додати бажання
+              </button>
+              <button type="reset" class="add-wish-btn add-wish-btn-reset">
+                Очистити поля
+              </button>
             </div>
           </form>
         </section>
-    
+
         <section>
           <h2>Мої бажання</h2>
+          <p id="loading" hidden>Завантаження...</p>
+          <p id="error-message" hidden></p>
           <div class="cards" id="wishlist">
             <article class="wish-card priority-high">
               <h3>Сумка</h3>
@@ -64,4 +90,3 @@
     </footer>
   </body>
 </html>
-
