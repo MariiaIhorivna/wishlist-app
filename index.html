@@ -6,7 +6,6 @@
     <title>Список бажань</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" href="assets/img/favicon-bow-tie.png" type="image/png" />
-    <script src="js/app.js" defer></script>
   </head>
   <body>
     <header>
@@ -89,5 +88,12 @@
     <footer>
       <p>Яценко М.І. Дані надані навчальним прикладом. Список бажань. © 2026</p>
     </footer>
+
+    <!-- React 18 + Babel standalone для JSX прямо в браузері -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel" src="js/app.js"></script>
   </body>
 </html>
