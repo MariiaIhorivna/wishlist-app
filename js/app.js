@@ -12,6 +12,7 @@ function App() {
       id: 1,
       title: 'Сумка',
       price: 1000,
+      url: '-',
       priority: 'high',
       completed: false,
     },
@@ -19,6 +20,7 @@ function App() {
       id: 2,
       title: 'Друшляк',
       price: 500,
+      url: '-',
       priority: 'low',
       completed: false,
     },
@@ -26,6 +28,7 @@ function App() {
       id: 3,
       title: 'Книжка',
       price: 600,
+      url: '-',
       priority: 'medium',
       completed: true,
     },
@@ -38,6 +41,7 @@ function App() {
   const [title, setTitle] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [priority, setPriority] = React.useState('medium');
+  const [url, setUrl] = React.useState('');
 
   function toggleWish(id) {
     setWishList((prevWishList) =>
@@ -63,6 +67,7 @@ function App() {
       title: title.trim(),
       price: Number(price),
       priority: priority,
+      url: url.trim() || '-',
       completed: false,
     };
 
@@ -70,6 +75,7 @@ function App() {
 
     setTitle('');
     setPrice('');
+    setUrl('');
     setPriority('medium');
   }
 
@@ -99,6 +105,7 @@ function App() {
               title: wish.title,
               completed: wish.completed,
               price: Math.floor(Math.random() * 10000),
+              url: '-',
               priority: 'low',
             }));
 
@@ -153,6 +160,20 @@ function App() {
               required
             />
 
+            <label htmlFor="add-wish-url-input">
+              Посилання на товар (необов'язково)
+            </label>
+
+            <input
+              className="add-wish-input"
+              type="url"
+              placeholder="https://example.com/product"
+              id="add-wish-url-input"
+              name="wish-url"
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+            />
+
             <label htmlFor="wishPriority">Пріоритет</label>
 
             <select
@@ -181,6 +202,7 @@ function App() {
                 onClick={() => {
                   setTitle('');
                   setPrice('');
+                  setUrl('');
                   setPriority('medium');
                 }}
               >
@@ -212,6 +234,7 @@ function App() {
                 id={wish.id}
                 name={wish.title}
                 price={wish.price}
+                url={wish.url}
                 priority={wish.priority}
                 completed={wish.completed}
                 toggle={toggleWish}
@@ -234,6 +257,7 @@ function WishItem({
   id,
   name,
   price,
+  url,
   priority,
   completed,
   toggle,
@@ -247,6 +271,16 @@ function WishItem({
     >
       <h3>{name}</h3>
       <p>{price} грн</p>
+
+      {url !== '-' ? (
+        <p className="regular-text">
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            Переглянути товар
+          </a>
+        </p>
+      ) : (
+        <p className="regular-text">Посилання: —</p>
+      )}
 
       <select
         className="priority-select"
@@ -268,6 +302,22 @@ function WishItem({
 
 const root = ReactDOM.createRoot(document.getElementById('app-root'));
 root.render(<App />);
+
+function saveToLocalStorage(items) {
+  localStorage.setItem('wishList', JSON.stringify(items));
+}
+
+// Завантаження списку бажань із localStorage
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem('wishList');
+
+    return raw ? JSON.parse(raw) : [];
+  } catch (error) {
+    console.error('Помилка читання даних із localStorage:', error);
+    return [];
+  }
+}
 
 // Масив із бажаннями (тепер зберігається в середині App через useState)
 /*const wishList = [

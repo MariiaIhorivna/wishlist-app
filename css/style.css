@@ -216,7 +216,8 @@ section h2 {
   content: 'Пріоритет: Низький';
 }
 
-.wish-card h3 {
+.wish-card h3,
+.wish-card .regular-text {
   font-size: 1.4rem;
   font-weight: 600;
 }
