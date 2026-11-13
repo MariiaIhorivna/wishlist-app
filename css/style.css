@@ -54,7 +54,8 @@ section {
   border-radius: 8px;
 }
 
-#retry-btn {
+#retry-btn,
+.delete-btn {
   display: block;
   margin: 12px auto;
   padding: 10px 24px;
@@ -154,7 +155,8 @@ section h2 {
 }
 
 .add-wish-btn-submit:hover,
-#retry-btn:hover {
+#retry-btn:hover,
+.delete-btn:hover {
   background-color: #ff758f;
   border-color: #ff758f;
   box-shadow: 0 4px 12px rgba(255, 141, 161, 0.4);
