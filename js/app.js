@@ -6,60 +6,311 @@
 const API_JSONPlaceholder =
   'https://jsonplaceholder.typicode.com/todos?userId=2';
 
+// Відкриває базу даних або створює її, якщо вона ще не існує
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      reject(
+        new Error(
+          'Ваш браузер не підтримує IndexedDB або доступ до неї обмежений.',
+        ),
+      );
+      return;
+    }
+
+    const request = indexedDB.open('WishListDB', 1);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      if (!db.objectStoreNames.contains('wishes')) {
+        db.createObjectStore('wishes', { keyPath: 'id' });
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+
+    request.onerror = () => {
+      reject(
+        new Error(
+          'Не вдалося відкрити базу даних. Перевірте налаштування браузера.',
+        ),
+      );
+    };
+  });
+}
+
+// Переносить збережені раніше бажання з localStorage до IndexedDB
+async function migrateData() {
+  if (localStorage.getItem('migrationCompleted')) {
+    return;
+  }
+
+  const items = await getAllItems();
+
+  if (items.length === 0) {
+    const savedItems = loadFromLocalStorage();
+
+    if (savedItems && savedItems.length > 0) {
+      for (const item of savedItems) {
+        await addItem(item);
+      }
+    }
+  }
+
+  localStorage.setItem('migrationCompleted', 'true');
+}
+
+// Додає нове бажання до бази даних
+async function addItem(item) {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('wishes', 'readwrite');
+
+    tx.objectStore('wishes').put(item);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Оновлює інформацію про бажання в базі даних
+async function updateItem(item) {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('wishes', 'readwrite');
+
+    tx.objectStore('wishes').put(item);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Отримує всі бажання, збережені в базі даних
+async function getAllItems() {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('wishes', 'readonly');
+
+    const request = tx.objectStore('wishes').getAll();
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Видаляє бажання з бази даних за його ID
+async function deleteItem(id) {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('wishes', 'readwrite');
+
+    tx.objectStore('wishes').delete(id);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 function App() {
-  const [wishList, setWishList] = React.useState([
-    {
-      id: 1,
-      title: 'Сумка',
-      price: 1000,
-      url: '-',
-      priority: 'high',
-      completed: false,
-    },
-    {
-      id: 2,
-      title: 'Друшляк',
-      price: 500,
-      url: '-',
-      priority: 'low',
-      completed: false,
-    },
-    {
-      id: 3,
-      title: 'Книжка',
-      price: 600,
-      url: '-',
-      priority: 'medium',
-      completed: true,
-    },
-  ]);
+  const [deletedWishIds, setDeletedWishIds] = React.useState(() => {
+    try {
+      const savedIds = JSON.parse(localStorage.getItem('deletedWishIds'));
+
+      return Array.isArray(savedIds) ? savedIds : [];
+    } catch (error) {
+      console.error('Помилка читання видалених ID:', error);
+      return [];
+    }
+  });
+
+  const deletedWishIdsRef = React.useRef(deletedWishIds);
+
+  React.useEffect(() => {
+    deletedWishIdsRef.current = deletedWishIds;
+  }, [deletedWishIds]);
+
+  const [wishList, setWishList] = React.useState([]);
+
+  async function refreshWishList() {
+    const items = await getAllItems();
+    setWishList(items);
+  }
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState('');
   const [reload, setReload] = React.useState(0);
+
+  React.useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      setError('');
+
+      try {
+        await migrateData();
+
+        const items = await getAllItems();
+
+        const savedItems = loadFromLocalStorage();
+
+        if (items.length === 0 && (!savedItems || savedItems.length === 0)) {
+          const initialWishes = [
+            {
+              id: 1,
+              title: 'Сумка',
+              price: 1000,
+              url: '-',
+              priority: 'high',
+              completed: false,
+            },
+            {
+              id: 2,
+              title: 'Друшляк',
+              price: 500,
+              url: '-',
+              priority: 'low',
+              completed: false,
+            },
+            {
+              id: 3,
+              title: 'Книжка',
+              price: 600,
+              url: '-',
+              priority: 'medium',
+              completed: true,
+            },
+          ];
+
+          for (const wish of initialWishes) {
+            await addItem(wish);
+          }
+        }
+
+        await refreshWishList();
+
+        const response = await fetch(API_JSONPlaceholder);
+
+        if (!response.ok) {
+          throw new Error(
+            `Помилка HTTP: ${response.status} ${response.statusText}`,
+          );
+        }
+
+        const data = await response.json();
+
+        const currentItems = await getAllItems();
+
+        const newWishes = data
+          .filter(
+            (wish) =>
+              !deletedWishIdsRef.current.includes(wish.id) &&
+              !currentItems.some((item) => item.id === wish.id),
+          )
+          .map((wish) => ({
+            id: wish.id,
+            title: wish.title,
+            completed: wish.completed,
+            price: Math.floor(Math.random() * 10000),
+            url: '-',
+            priority: 'low',
+          }));
+
+        for (const wish of newWishes) {
+          await addItem(wish);
+        }
+
+        await refreshWishList();
+      } catch (error) {
+        setError(
+          'Список бажань недоступний офлайн. Показано раніше завантажені бажання.',
+        );
+
+        console.error('Помилка завантаження даних:', error);
+
+        setError(
+          error.message.includes('IndexedDB') ||
+            error.message.includes('базу даних')
+            ? error.message
+            : 'Не вдалося завантажити дані. Перевірте підключення до інтернету або дозвіл доступу до сховища у вашому браузері.',
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, [reload]);
 
   const [title, setTitle] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [priority, setPriority] = React.useState('medium');
   const [url, setUrl] = React.useState('');
 
-  function toggleWish(id) {
-    setWishList((prevWishList) =>
-      prevWishList.map((wish) =>
-        wish.id === id ? { ...wish, completed: !wish.completed } : wish,
-      ),
-    );
+  async function toggleWish(id) {
+    try {
+      const wish = wishList.find((item) => item.id === id);
+
+      if (!wish) return;
+
+      const updatedWish = {
+        ...wish,
+        completed: !wish.completed,
+      };
+
+      await updateItem(updatedWish);
+      await refreshWishList();
+    } catch (error) {
+      console.error('Помилка оновлення бажання:', error);
+    }
   }
 
-  function changePriority(id, newPriority) {
-    setWishList((prevWishList) =>
-      prevWishList.map((wish) =>
-        wish.id === id ? { ...wish, priority: newPriority } : wish,
-      ),
-    );
+  async function changePriority(id, newPriority) {
+    try {
+      const wish = wishList.find((item) => item.id === id);
+
+      if (!wish) return;
+
+      const updatedWish = {
+        ...wish,
+        priority: newPriority,
+      };
+
+      await updateItem(updatedWish);
+      await refreshWishList();
+    } catch (error) {
+      console.error('Помилка зміни пріоритету:', error);
+    }
   }
 
-  function addWish(event) {
+  async function removeWish(id) {
+    try {
+      await deleteItem(id);
+
+      if (typeof id === 'number') {
+        const updatedIds = deletedWishIdsRef.current.includes(id)
+          ? deletedWishIdsRef.current
+          : [...deletedWishIdsRef.current, id];
+
+        deletedWishIdsRef.current = updatedIds;
+        setDeletedWishIds(updatedIds);
+      }
+
+      await refreshWishList();
+    } catch (error) {
+      console.error('Помилка видалення бажання:', error);
+    }
+  }
+
+  React.useEffect(() => {
+    localStorage.setItem('deletedWishIds', JSON.stringify(deletedWishIds));
+  }, [deletedWishIds]);
+
+  async function addWish(event) {
     event.preventDefault();
 
     const newWish = {
@@ -71,59 +322,18 @@ function App() {
       completed: false,
     };
 
-    setWishList((prevWishList) => [...prevWishList, newWish]);
+    try {
+      await addItem(newWish);
+      await refreshWishList();
 
-    setTitle('');
-    setPrice('');
-    setUrl('');
-    setPriority('medium');
-  }
-
-  React.useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-      setError('');
-
-      try {
-        const response = await fetch(API_JSONPlaceholder);
-
-        if (!response.ok) {
-          throw new Error(
-            `Помилка HTTP: ${response.status} ${response.statusText}`,
-          );
-        }
-
-        const data = await response.json();
-
-        setWishList((prevWishList) => {
-          const newWishes = data
-            .filter(
-              (wish) => !prevWishList.some((item) => item.title === wish.title),
-            )
-            .map((wish) => ({
-              id: wish.id,
-              title: wish.title,
-              completed: wish.completed,
-              price: Math.floor(Math.random() * 10000),
-              url: '-',
-              priority: 'low',
-            }));
-
-          return [...prevWishList, ...newWishes];
-        });
-      } catch (error) {
-        setError(
-          'Список бажань недоступний офлайн. Показано раніше завантажені бажання.',
-        );
-
-        console.error('Помилка завантаження даних:', error);
-      } finally {
-        setIsLoading(false);
-      }
+      setTitle('');
+      setPrice('');
+      setUrl('');
+      setPriority('medium');
+    } catch (error) {
+      console.error('Помилка додавання бажання:', error);
     }
-
-    loadData();
-  }, [reload]);
+  }
 
   return (
     <>
@@ -223,6 +433,7 @@ function App() {
             type="button"
             id="retry-btn"
             onClick={() => setReload((prev) => prev + 1)}
+            disabled={isLoading}
           >
             Оновити
           </button>
@@ -239,6 +450,7 @@ function App() {
                 completed={wish.completed}
                 toggle={toggleWish}
                 changePriority={changePriority}
+                remove={removeWish}
               />
             ))}
           </div>
@@ -262,6 +474,7 @@ function WishItem({
   completed,
   toggle,
   changePriority,
+  remove,
 }) {
   return (
     <article
@@ -269,6 +482,10 @@ function WishItem({
         completed ? 'wish-card--purchased' : ''
       }`}
     >
+      <button className="delete-btn" type="button" onClick={() => remove(id)}>
+        Видалити
+      </button>
+
       <h3>{name}</h3>
       <p>{price} грн</p>
 
@@ -303,43 +520,16 @@ function WishItem({
 const root = ReactDOM.createRoot(document.getElementById('app-root'));
 root.render(<App />);
 
-function saveToLocalStorage(items) {
-  localStorage.setItem('wishList', JSON.stringify(items));
-}
-
-// Завантаження списку бажань із localStorage
 function loadFromLocalStorage() {
   try {
     const raw = localStorage.getItem('wishList');
 
-    return raw ? JSON.parse(raw) : [];
+    return raw ? JSON.parse(raw) : null;
   } catch (error) {
     console.error('Помилка читання даних із localStorage:', error);
-    return [];
+    return null;
   }
 }
-
-// Масив із бажаннями (тепер зберігається в середині App через useState)
-/*const wishList = [
-  {
-    title: 'Сумка',
-    price: 1000,
-    priority: 'high',
-    completed: false,
-  },
-  {
-    title: 'Друшляк',
-    price: 500,
-    priority: 'low',
-    completed: false,
-  },
-  {
-    title: 'Книжка',
-    price: 600,
-    priority: 'medium',
-    completed: true,
-  },
-];*/
 
 // Обчислює загальну суму всіх бажань у масиві та повертає результат
 function getTotalCost(wishList) {
@@ -351,165 +541,3 @@ function getTotalCost(wishList) {
 
   return totalCost;
 }
-
-// Усю основну частину інтерфейсу перенесено на React.
-// Ручне створення DOM-елементів більше не використовується.
-
-// Класифікація елементів: додаємо прапорець isHighPriority для бажань з високим пріоритетом
-// for (const wish of wishList) {
-//   wish.isHighPriority = wish.priority === 'high' ? true : false;
-// }
-
-// const listContainer = document.querySelector('#wishlist');
-
-// Функція для динамічного створення та виведення карток бажань на сторінку
-/*function renderWishList(wishList) {
-  listContainer.innerHTML = '';
-
-  for (const [index, wish] of wishList.entries()) {
-    const card = document.createElement('article');
-    const titleCard = document.createElement('h3');
-    const priceCard = document.createElement('p');
-
-    titleCard.textContent = wish.title;
-    priceCard.textContent = `${wish.price} грн`;
-
-    card.append(titleCard, priceCard);
-    card.setAttribute('data-priority', wish.priority);
-    card.setAttribute('data-index', index);
-
-    card.insertAdjacentHTML(
-      'beforeend',
-      `<select class="priority-select" aria-label="Пріоритет бажання">
-          <option value="low" ${wish.priority === 'low' ? 'selected' : ''}>Низький</option>
-          <option value="medium" ${wish.priority === 'medium' ? 'selected' : ''}>Середній</option>
-          <option value="high" ${wish.priority === 'high' ? 'selected' : ''}>Високий</option>
-      </select>`,
-    );
-
-    card.classList.add('wish-card');
-
-    if (wish.completed) {
-      card.classList.add('wish-card--purchased');
-    }
-
-    const purchasedBtn = document.createElement('button');
-    purchasedBtn.classList.add('purchased-btn');
-
-    purchasedBtn.textContent = wish.completed
-      ? 'Повернути в список'
-      : 'Позначити як придбане';
-
-    purchasedBtn.addEventListener('click', () => {
-      wish.completed = !wish.completed;
-      renderWishList(wishList);
-    });
-
-    if (wish.priority === 'high') {
-      card.classList.add('priority-high');
-    } else if (wish.priority === 'medium') {
-      card.classList.add('priority-medium');
-    } else {
-      card.classList.add('priority-low');
-    }
-
-    listContainer.append(card);
-    card.append(purchasedBtn);
-  }
-
-  const totalPrice = document.getElementById('total-price');
-  totalPrice.textContent = `${getTotalCost(wishList)} грн`;
-}*/
-
-// Обробник події сабміту форми: додає нове бажання до масиву, оновлює інтерфейс і скидає форму
-// const form = document.querySelector('.add-wish-form');
-// form.addEventListener('submit', (event) => {
-//   event.preventDefault();
-//   const titleValueForm = event.target.elements['wish-title'].value;
-//   const priceValueForm = Number(event.target.elements['wish-price'].value);
-//   const priorityValueForm = event.target.elements['wish-priority'].value;
-
-//   const newWish = {
-//     title: titleValueForm,
-//     price: priceValueForm,
-//     priority: priorityValueForm,
-//   };
-
-//   wishList.push(newWish);
-
-//   renderWishList(wishList);
-
-//   form.reset();
-// });
-
-// // Обробник події введення для ціни: перевіряє значення на від'ємність та керує кастомною валідацією
-// const priceInput = document.querySelector('input[name="wish-price"]');
-// priceInput.addEventListener('input', () => {
-//   if (priceInput.value !== '' && Number(priceInput.value) < 0) {
-//     priceInput.setCustomValidity("Ціна не може бути від'ємною");
-//     priceInput.reportValidity();
-//   } else {
-//     priceInput.setCustomValidity('');
-//   }
-// });
-
-// // Обробник події change через делегування: оновлює пріоритет бажання в масиві та змінює стиль картки динамічно без перерендеру
-// listContainer.addEventListener('change', (event) => {
-//   if (event.target.classList.contains('priority-select')) {
-//     const selectElement = event.target;
-//     const newPriority = selectElement.value;
-
-//     const card = selectElement.closest('.wish-card');
-//     const index = card.dataset.index;
-
-//     wishList[index].priority = newPriority;
-
-//     card.classList.remove('priority-low', 'priority-medium', 'priority-high');
-//     card.classList.add(`priority-${newPriority}`);
-//     card.setAttribute('data-priority', newPriority);
-//   }
-// });
-
-// Отримання списку завдань з JSONPlaceholder API:
-// https://jsonplaceholder.typicode.com/todos?userId=2
-// async function loadData() {
-//   const loading = document.getElementById('loading');
-//   const errorMessage = document.getElementById('error-message');
-//   const retryBtn = document.getElementById('retry-btn');
-//   loading.hidden = false;
-//   errorMessage.hidden = true;
-//   retryBtn.hidden = true;
-//   try {
-//     const response = await fetch(API_JSONPlaceholder);
-//     if (!response.ok) {
-//       throw new Error(
-//         `Помилка HTTP: ${response.status} ${response.statusText}`,
-//       );
-//     }
-//     const data = await response.json();
-//     const wishes = data
-//       .filter((wish) => !wishList.some((item) => item.title === wish.title))
-//       .map((wish) => ({
-//         title: wish.title,
-//         completed: wish.completed,
-//         price: Math.floor(Math.random() * 10000),
-//       }));
-
-//     wishList.push(...wishes);
-//     renderWishList(wishList);
-//   } catch (error) {
-//     errorMessage.textContent =
-//       'Список бажань недоступний офлайн. Показано раніше завантажені бажання.';
-//     errorMessage.hidden = false;
-//     retryBtn.hidden = false;
-
-//     console.error('Помилка завантаження даних:', error);
-//   } finally {
-//     loading.hidden = true;
-//   }
-// }
-
-// const retryBtn = document.getElementById('retry-btn');
-// retryBtn.addEventListener('click', loadData);
-
-// loadData();
