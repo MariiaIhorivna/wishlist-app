@@ -547,7 +547,7 @@ function WishItem({
         value={amount}
         onChange={(event) => setAmount(event.target.value)}
       />
-      {/* Зберігає змінену суму та оновлює прогрес-бар */}s
+      {/* Зберігає змінену суму та оновлює прогрес-бар */}
       <button
         type="button"
         className="purchased-btn"
