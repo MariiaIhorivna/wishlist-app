@@ -339,6 +339,7 @@ function App() {
     }
   }
 
+  // Оновлює накопичену суму для бажання з урахуванням допустимих меж
   async function addSavings(id, amount) {
     if (!Number.isFinite(amount) || amount === 0) return false;
 
@@ -509,7 +510,9 @@ function WishItem({
   changePriority,
   remove,
 }) {
+  // Обчислює відсоток накопичення від ціни товару, обмежуючи його значення від 0 до 100
   const progress = price > 0 ? Math.min((savedAmount / price) * 100, 100) : 0;
+  // Зберігає введену користувачем суму для поповнення або зменшення накопичень
   const [amount, setAmount] = React.useState('');
 
   return (
@@ -521,10 +524,9 @@ function WishItem({
       <button className="delete-btn" type="button" onClick={() => remove(id)}>
         Видалити
       </button>
-
       <h3>{name}</h3>
       <p>{price} грн</p>
-
+      {/* Відображає прогрес накопичення коштів за допомогою анімованого індикатора */}
       <div className="progress-container">
         <div className="progress-bar">
           <div
@@ -536,7 +538,7 @@ function WishItem({
           {Number(progress.toFixed(2))}% накопичено
         </p>
       </div>
-
+      {/* Дозволяє ввести суму, на яку потрібно змінити накопичення */}
       <input
         type="number"
         step="0.01"
@@ -545,7 +547,7 @@ function WishItem({
         value={amount}
         onChange={(event) => setAmount(event.target.value)}
       />
-
+      {/* Зберігає змінену суму та оновлює прогрес-бар */}s
       <button
         type="button"
         className="purchased-btn"
@@ -559,7 +561,6 @@ function WishItem({
       >
         Поповнити
       </button>
-
       {url !== '-' ? (
         <p className="regular-text">
           <a href={url} target="_blank" rel="noopener noreferrer">
@@ -569,7 +570,6 @@ function WishItem({
       ) : (
         <p className="regular-text">Посилання: —</p>
       )}
-
       <select
         className="priority-select"
         aria-label="Пріоритет бажання"
@@ -580,7 +580,6 @@ function WishItem({
         <option value="medium">Середній</option>
         <option value="high">Високий</option>
       </select>
-
       <button className="purchased-btn" onClick={() => toggle(id)}>
         {completed ? 'Повернути в список' : 'Позначити як придбане'}
       </button>
