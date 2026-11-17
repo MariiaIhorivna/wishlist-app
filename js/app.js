@@ -164,6 +164,7 @@ function App() {
               id: 1,
               title: 'Сумка',
               price: 1000,
+              savedAmount: 0,
               url: '-',
               priority: 'high',
               completed: false,
@@ -172,6 +173,7 @@ function App() {
               id: 2,
               title: 'Друшляк',
               price: 500,
+              savedAmount: 0,
               url: '-',
               priority: 'low',
               completed: false,
@@ -180,6 +182,7 @@ function App() {
               id: 3,
               title: 'Книжка',
               price: 600,
+              savedAmount: 0,
               url: '-',
               priority: 'medium',
               completed: true,
@@ -216,6 +219,7 @@ function App() {
             title: wish.title,
             completed: wish.completed,
             price: Math.floor(Math.random() * 10000),
+            savedAmount: 0,
             url: '-',
             priority: 'low',
           }));
@@ -335,6 +339,31 @@ function App() {
     }
   }
 
+  async function addSavings(id, amount) {
+    if (!Number.isFinite(amount) || amount === 0) return false;
+
+    try {
+      const wish = wishList.find((item) => item.id === id);
+      if (!wish) return false;
+
+      const updatedWish = {
+        ...wish,
+        savedAmount: Math.min(
+          Math.max(0, (wish.savedAmount || 0) + amount),
+          wish.price,
+        ),
+      };
+
+      await updateItem(updatedWish);
+      await refreshWishList();
+
+      return true;
+    } catch (error) {
+      console.error('Помилка оновлення накопичень:', error);
+      return false;
+    }
+  }
+
   return (
     <>
       <main>
@@ -445,6 +474,8 @@ function App() {
                 id={wish.id}
                 name={wish.title}
                 price={wish.price}
+                savedAmount={wish.savedAmount || 0}
+                onSave={addSavings}
                 url={wish.url}
                 priority={wish.priority}
                 completed={wish.completed}
@@ -469,6 +500,8 @@ function WishItem({
   id,
   name,
   price,
+  savedAmount,
+  onSave,
   url,
   priority,
   completed,
@@ -476,6 +509,9 @@ function WishItem({
   changePriority,
   remove,
 }) {
+  const progress = price > 0 ? Math.min((savedAmount / price) * 100, 100) : 0;
+  const [amount, setAmount] = React.useState('');
+
   return (
     <article
       className={`wish-card priority-${priority} ${
@@ -488,6 +524,41 @@ function WishItem({
 
       <h3>{name}</h3>
       <p>{price} грн</p>
+
+      <div className="progress-container">
+        <div className="progress-bar">
+          <div
+            className="progress-bar__fill"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        <p className="regular-text">
+          {Number(progress.toFixed(2))}% накопичено
+        </p>
+      </div>
+
+      <input
+        type="number"
+        step="0.01"
+        placeholder="Сума поповнення"
+        className="add-wish-input"
+        value={amount}
+        onChange={(event) => setAmount(event.target.value)}
+      />
+
+      <button
+        type="button"
+        className="purchased-btn"
+        onClick={async () => {
+          const success = await onSave(id, Number(amount));
+
+          if (success) {
+            setAmount('');
+          }
+        }}
+      >
+        Поповнити
+      </button>
 
       {url !== '-' ? (
         <p className="regular-text">
