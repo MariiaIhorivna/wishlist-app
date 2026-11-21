@@ -41,6 +41,10 @@ section {
   font-size: 1.2rem;
 }
 
+a {
+  color: black;
+}
+
 #error-message {
   margin: 20px auto;
   padding: 12px 18px;
