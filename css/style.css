@@ -152,6 +152,14 @@ section h2 {
     box-shadow 0.2s ease;
 }
 
+.wish-btn-purchased {
+  display: inline-block;
+  background-color: #ff8da1;
+  color: #3e141b;
+  border: 1.5px solid #ff8da1;
+  text-decoration: none;
+}
+
 .add-wish-btn-submit {
   background-color: #ff8da1;
   color: #3e141b;
@@ -160,7 +168,8 @@ section h2 {
 
 .add-wish-btn-submit:hover,
 #retry-btn:hover,
-.delete-btn:hover {
+.delete-btn:hover,
+.wish-btn-purchased:hover {
   background-color: #ff758f;
   border-color: #ff758f;
   box-shadow: 0 4px 12px rgba(255, 141, 161, 0.4);

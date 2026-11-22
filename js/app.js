@@ -616,6 +616,14 @@ function App() {
             <section>
               <h2>Мої бажання</h2>
 
+              <a
+                href="#/purchased"
+                data-link
+                className="add-wish-btn wish-btn-purchased"
+              >
+                Переглянути придбані бажання
+              </a>
+
               {isLoading && <p id="loading">Завантаження...</p>}
 
               {error && <p id="error-message">{error}</p>}
