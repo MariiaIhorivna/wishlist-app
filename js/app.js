@@ -117,6 +117,48 @@ async function deleteItem(id) {
   });
 }
 
+// Таблиця маршрутів застосунку та відповідних функцій відображення
+
+const routes = [
+  {
+    path: '/',
+    view: 'renderWishList',
+  },
+  {
+    path: '/wishes/:id',
+    view: 'renderWishDetails',
+  },
+  {
+    path: '/purchased',
+    view: 'renderPurchasedWishes',
+  },
+];
+
+function matchRoute(path) {
+  const pathParts = path.split('/').filter(Boolean);
+
+  for (const route of routes) {
+    const routeParts = route.path.split('/').filter(Boolean);
+
+    if (routeParts.length !== pathParts.length) continue;
+
+    const params = {};
+
+    const isMatch = routeParts.every((part, i) => {
+      if (part.startsWith(':')) {
+        params[part.slice(1)] = pathParts[i];
+        return true;
+      }
+
+      return part === pathParts[i];
+    });
+
+    if (isMatch) return { view: route.view, params };
+  }
+
+  return null;
+}
+
 function App() {
   const [deletedWishIds, setDeletedWishIds] = React.useState(() => {
     try {
@@ -255,6 +297,26 @@ function App() {
   const [priority, setPriority] = React.useState('medium');
   const [url, setUrl] = React.useState('');
 
+  const [currentRoute, setCurrentRoute] = React.useState(() => {
+    const path = window.location.hash.slice(1) || '/';
+    return matchRoute(path);
+  });
+
+  React.useEffect(() => {
+    function handleHashChange() {
+      const path = window.location.hash.slice(1) || '/';
+      const route = matchRoute(path);
+
+      setCurrentRoute(route);
+    }
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
   async function toggleWish(id) {
     try {
       const wish = wishList.find((item) => item.id === id);
@@ -365,134 +427,256 @@ function App() {
     }
   }
 
+  function renderWishList() {
+    return wishList.map((wish) => (
+      <WishItem
+        key={wish.id}
+        id={wish.id}
+        name={wish.title}
+        price={wish.price}
+        savedAmount={wish.savedAmount || 0}
+        onSave={addSavings}
+        url={wish.url}
+        priority={wish.priority}
+        completed={wish.completed}
+        toggle={toggleWish}
+        changePriority={changePriority}
+        remove={removeWish}
+      />
+    ));
+  }
+
+  function renderPurchasedWishes() {
+    const purchasedWishes = wishList.filter((wish) => wish.completed === true);
+
+    return purchasedWishes.map((wish) => (
+      <WishItem
+        key={wish.id}
+        id={wish.id}
+        name={wish.title}
+        price={wish.price}
+        savedAmount={wish.savedAmount || 0}
+        onSave={addSavings}
+        url={wish.url}
+        priority={wish.priority}
+        completed={wish.completed}
+        toggle={toggleWish}
+        changePriority={changePriority}
+        remove={removeWish}
+      />
+    ));
+  }
+
+  function renderWishDetails(id) {
+    const wish = wishList.find((item) => String(item.id) === id);
+
+    if (!wish) {
+      return <p>Товар не знайдено.</p>;
+    }
+
+    return (
+      <article className="wish-card">
+        <h2>{wish.title}</h2>
+        <p>Ціна: {wish.price} грн</p>
+        <p>
+          Посилання:{' '}
+          {wish.url !== '-' ? (
+            <a href={wish.url} target="_blank" rel="noopener noreferrer">
+              Переглянути товар
+            </a>
+          ) : (
+            'Відсутнє'
+          )}
+        </p>
+      </article>
+    );
+  }
+
+  React.useEffect(() => {
+    function handleLinkClick(event) {
+      const link = event.target.closest('a[data-link]');
+
+      if (!link) return;
+
+      event.preventDefault();
+
+      window.location.hash = link.getAttribute('href').slice(1);
+    }
+
+    document.addEventListener('click', handleLinkClick);
+
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const root = document.getElementById('app-root');
+
+    if (currentRoute === null) {
+      root.classList.add('not-found-layout');
+    } else {
+      root.classList.remove('not-found-layout');
+    }
+
+    return () => {
+      root.classList.remove('not-found-layout');
+    };
+  }, [currentRoute]);
+
   return (
     <>
-      <main>
-        <section>
-          <h2>Додати бажання</h2>
+      {currentRoute?.view === 'renderWishList' && (
+        <>
+          <main>
+            <section>
+              <h2>Додати бажання</h2>
 
-          <form className="add-wish-form" onSubmit={addWish}>
-            <label htmlFor="add-wish-title-input">Назва бажання</label>
+              <form className="add-wish-form" onSubmit={addWish}>
+                <label htmlFor="add-wish-title-input">Назва бажання</label>
 
-            <input
-              className="add-wish-input"
-              type="text"
-              placeholder="Машина"
-              id="add-wish-title-input"
-              name="wish-title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              required
-            />
+                <input
+                  className="add-wish-input"
+                  type="text"
+                  placeholder="Машина"
+                  id="add-wish-title-input"
+                  name="wish-title"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  required
+                />
 
-            <label htmlFor="add-wish-price-input">Ціна бажання</label>
+                <label htmlFor="add-wish-price-input">Ціна бажання</label>
 
-            <input
-              className="add-wish-input"
-              type="number"
-              placeholder="10000 (вказується в гривнях)"
-              min="0"
-              step="0.01"
-              id="add-wish-price-input"
-              name="wish-price"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-              required
-            />
+                <input
+                  className="add-wish-input"
+                  type="number"
+                  placeholder="10000 (вказується в гривнях)"
+                  min="0"
+                  step="0.01"
+                  id="add-wish-price-input"
+                  name="wish-price"
+                  value={price}
+                  onChange={(event) => setPrice(event.target.value)}
+                  required
+                />
 
-            <label htmlFor="add-wish-url-input">
-              Посилання на товар (необов'язково)
-            </label>
+                <label htmlFor="add-wish-url-input">
+                  Посилання на товар (необов'язково)
+                </label>
 
-            <input
-              className="add-wish-input"
-              type="url"
-              placeholder="https://example.com/product"
-              id="add-wish-url-input"
-              name="wish-url"
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-            />
+                <input
+                  className="add-wish-input"
+                  type="url"
+                  placeholder="https://example.com/product"
+                  id="add-wish-url-input"
+                  name="wish-url"
+                  value={url}
+                  onChange={(event) => setUrl(event.target.value)}
+                />
 
-            <label htmlFor="wishPriority">Пріоритет</label>
+                <label htmlFor="wishPriority">Пріоритет</label>
 
-            <select
-              name="wish-priority"
-              id="wishPriority"
-              className="priority-select"
-              value={priority}
-              onChange={(event) => setPriority(event.target.value)}
-            >
-              <option value="low">Низький ⚪</option>
-              <option value="medium">Середній 🟡</option>
-              <option value="high">Високий 🔴</option>
-            </select>
+                <select
+                  name="wish-priority"
+                  id="wishPriority"
+                  className="priority-select"
+                  value={priority}
+                  onChange={(event) => setPriority(event.target.value)}
+                >
+                  <option value="low">Низький ⚪</option>
+                  <option value="medium">Середній 🟡</option>
+                  <option value="high">Високий 🔴</option>
+                </select>
 
-            <div className="add-wish-btn-container">
-              <button
-                type="submit"
-                className="add-wish-btn add-wish-btn-submit"
-              >
-                Додати бажання
-              </button>
+                <div className="add-wish-btn-container">
+                  <button
+                    type="submit"
+                    className="add-wish-btn add-wish-btn-submit"
+                  >
+                    Додати бажання
+                  </button>
+
+                  <button
+                    type="button"
+                    className="add-wish-btn add-wish-btn-reset"
+                    onClick={() => {
+                      setTitle('');
+                      setPrice('');
+                      setUrl('');
+                      setPriority('medium');
+                    }}
+                  >
+                    Очистити поля
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section>
+              <h2>Мої бажання</h2>
+
+              {isLoading && <p id="loading">Завантаження...</p>}
+
+              {error && <p id="error-message">{error}</p>}
 
               <button
                 type="button"
-                className="add-wish-btn add-wish-btn-reset"
-                onClick={() => {
-                  setTitle('');
-                  setPrice('');
-                  setUrl('');
-                  setPriority('medium');
-                }}
+                id="retry-btn"
+                onClick={() => setReload((prev) => prev + 1)}
+                disabled={isLoading}
               >
-                Очистити поля
+                Оновити
               </button>
+
+              <div className="cards">{renderWishList()}</div>
+            </section>
+          </main>
+
+          <aside>
+            <h2>Підсумкова сума</h2>
+            <p>{getTotalCost(wishList)} грн</p>
+          </aside>
+        </>
+      )}
+
+      {currentRoute?.view === 'renderPurchasedWishes' && (
+        <main>
+          <section>
+            <h2>Придбані бажання</h2>
+
+            {isLoading ? (
+              <p>Завантаження...</p>
+            ) : (
+              <div className="cards">{renderPurchasedWishes()}</div>
+            )}
+          </section>
+        </main>
+      )}
+
+      {currentRoute?.view === 'renderWishDetails' && (
+        <main>
+          {isLoading ? (
+            <p>Завантаження...</p>
+          ) : (
+            renderWishDetails(currentRoute.params.id)
+          )}
+        </main>
+      )}
+
+      {currentRoute === null && (
+        <main className="not-found-main">
+          <section className="not-found-page">
+            <div className="not-found-content">
+              <h2>Сторінку не знайдено</h2>
+              <p>На жаль, такої сторінки не існує.</p>
+              <a className="regular-text" href="#/" data-link>
+                Повернутися на головну
+              </a>
             </div>
-          </form>
-        </section>
-
-        <section>
-          <h2>Мої бажання</h2>
-
-          {isLoading && <p id="loading">Завантаження...</p>}
-
-          {error && <p id="error-message">{error}</p>}
-
-          <button
-            type="button"
-            id="retry-btn"
-            onClick={() => setReload((prev) => prev + 1)}
-            disabled={isLoading}
-          >
-            Оновити
-          </button>
-
-          <div className="cards">
-            {wishList.map((wish) => (
-              <WishItem
-                key={wish.id}
-                id={wish.id}
-                name={wish.title}
-                price={wish.price}
-                savedAmount={wish.savedAmount || 0}
-                onSave={addSavings}
-                url={wish.url}
-                priority={wish.priority}
-                completed={wish.completed}
-                toggle={toggleWish}
-                changePriority={changePriority}
-                remove={removeWish}
-              />
-            ))}
-          </div>
-        </section>
-      </main>
-
-      <aside>
-        <h2>Підсумкова сума</h2>
-        <p>{getTotalCost(wishList)} грн</p>
-      </aside>
+          </section>
+        </main>
+      )}
     </>
   );
 }
@@ -526,6 +710,9 @@ function WishItem({
       </button>
       <h3>{name}</h3>
       <p>{price} грн</p>
+      <a className="regular-text" href={`#/wishes/${id}`} data-link>
+        Детальніше
+      </a>
       {/* Відображає прогрес накопичення коштів за допомогою анімованого індикатора */}
       <div className="progress-container">
         <div className="progress-bar">
