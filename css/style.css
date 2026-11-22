@@ -294,6 +294,43 @@ footer {
   transition: width 0.4s ease;
 }
 
+main:has(.not-found-page) {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.not-found-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.not-found-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.not-found-content h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.not-found-content p {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.not-found-content a {
+  margin-top: 10px;
+  font-size: 1.5rem;
+}
+
 @media (min-width: 600px) {
   .wish-card,
   section h2 {
@@ -315,6 +352,14 @@ footer {
   .content {
     display: grid;
     grid-template-columns: 3fr 1fr;
+  }
+
+  .content.not-found-layout {
+    display: block;
+  }
+
+  .content.not-found-layout main {
+    max-width: none;
   }
 
   aside {
