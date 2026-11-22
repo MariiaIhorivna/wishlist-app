@@ -652,6 +652,9 @@ function App() {
         <main>
           <section>
             <h2>Придбані бажання</h2>
+            <a href="#/" data-link className="add-wish-btn wish-btn-purchased">
+              Повернутися до всіх бажань
+            </a>
 
             {isLoading ? (
               <p>Завантаження...</p>
